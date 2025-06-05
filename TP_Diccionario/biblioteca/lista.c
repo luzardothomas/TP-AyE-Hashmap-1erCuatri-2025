@@ -60,12 +60,6 @@ int insertar_en_orden_hasta(t_lista* pl,const void* dato,size_t tam,comparar_lis
   return 1;
 }
 
-t_lista* buscar_lista(t_lista* pl,void* dato,comparar_lista cmp) {
-  while(*pl && cmp((*pl)->dato,dato))
-    pl = &(*pl)->sig;
-  return pl;
-}
-
 void recorrer_lista(const t_lista* pl,accion_lista act,void* param) {
   while(*pl) {
     act((*pl)->dato,param);

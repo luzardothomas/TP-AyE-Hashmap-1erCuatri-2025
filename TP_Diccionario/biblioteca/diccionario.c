@@ -8,29 +8,26 @@ size_t funcion_hash(const unsigned char *clave, size_t len) {
   return hash;
 }
 
-void crear_diccionario(t_diccionario* pd,size_t capacidad_maxima,void* funcion_hash,void* funcion_comparar,void* funcion_accion,comparar_lista cmp_indice) {
+void crear_diccionario(t_diccionario* pd,size_t capacidad_maxima,void* funcion_comparar) {
   pd->table_map = calloc(capacidad_maxima,sizeof(t_bucket));
   pd->capacidad_maxima = capacidad_maxima;
-  pd->funcion_hash = funcion_hash;
   pd->cmp = funcion_comparar;
-  pd->act = funcion_accion;
-  pd->indice_claves = NULL;
-  pd->cmp_indice = cmp_indice;
 }
 
-int poner_diccionario(t_diccionario* pd,const void* clave, const void* valor,size_t tam_clave, size_t tam_valor) {
+int poner_diccionario(t_diccionario* pd,accion_diccionario act,const void* clave, const void* valor,size_t tam_clave, size_t tam_valor) {
   size_t indice = 0;
   size_t hash;
   int comp = 2;
   t_bucket* aux;
-  t_bucket* inicio;
   t_nodo_bucket* nue;
 
-  if(pd->funcion_hash == NULL || pd->table_map == NULL)
+  /// si no hubo memoria para el table_map salgo
+
+  if(pd->table_map == NULL)
     return 0;
 
-  hash = pd->funcion_hash(clave,tam_clave);
-  indice = (long)hash % pd->capacidad_maxima;
+  hash = funcion_hash(clave,tam_clave);
+  indice = hash % pd->capacidad_maxima;
 
   /// insertar en el bucket
 
@@ -63,11 +60,9 @@ int poner_diccionario(t_diccionario* pd,const void* clave, const void* valor,siz
   /// chequear si hay un bucket
 
   aux = pd->table_map + indice *sizeof(t_bucket);
-  inicio = aux;
 
   while((*aux) && (comp = pd->cmp((*aux)->clave,clave)) != 0)
     aux = &(*aux)->sig;
-
 
   /// controlar si hay clave duplicada
 
@@ -75,16 +70,12 @@ int poner_diccionario(t_diccionario* pd,const void* clave, const void* valor,siz
     free(nue->clave);
     free(nue->valor);
     free(nue);
-    if(pd->act)
-      pd->act((*aux)->valor,(void*)valor);
+    if(act)
+      act((*aux)->valor,(void*)valor);
     return 2;
   }
 
   *aux = nue;
-
-  if(*inicio && !(*inicio)->sig)
-    insertar_al_principio_lista(&pd->indice_claves,&indice,sizeof(indice));
-
 
   return 1;
 }
@@ -95,13 +86,13 @@ int obtener_diccionario(const t_diccionario* pd,const void* clave,void* valor,si
   int complejidad = 1;
   t_bucket* aux;
 
-  if(pd->funcion_hash == NULL || pd->table_map == NULL || pd->indice_claves == NULL)
+  if(pd->table_map == NULL)
     return 0;
 
   /// se calcula el hash para luego calcular el indice
 
-  hash = pd->funcion_hash(clave,tam_clave);
-  indice = (long)hash % pd->capacidad_maxima;
+  hash = funcion_hash(clave,tam_clave);
+  indice = hash % pd->capacidad_maxima;
 
   /// se apunta el table_map hacia donde esta el nodo bucket
 
@@ -135,15 +126,15 @@ int sacar_diccionario(t_diccionario* pd,const void* clave,size_t tam_clave) {
   size_t indice;
   t_bucket* aux;
   int comp = 2;
-  t_lista* buscar_indice;
+  int i = 0;
 
-  if(pd->funcion_hash == NULL || pd->table_map == NULL || pd->indice_claves == NULL)
+  if(pd->table_map == NULL)
     return 0;
 
   /// se calcula el hash para luego calcular el indice
 
-  hash = pd->funcion_hash(clave,tam_clave);
-  indice = (long)hash % pd->capacidad_maxima;
+  hash = funcion_hash(clave,tam_clave);
+  indice = hash % pd->capacidad_maxima;
 
   /// se apunta el table_map hacia donde esta el nodo bucket
 
@@ -154,20 +145,20 @@ int sacar_diccionario(t_diccionario* pd,const void* clave,size_t tam_clave) {
   while(*aux && (comp = pd->cmp((*aux)->clave,clave)) != 0)
     aux = &(*aux)->sig;
 
-  /// si es el unico nodo bucket hay que eliminar la clave de la lista de claves
-
-  if(comp == 0 && !(*aux)->sig) {
-    buscar_indice = buscar_lista(&pd->indice_claves,&indice,pd->cmp_indice);
-
-    if(*buscar_indice)
-      eliminar_nodo(buscar_indice);
-  }
+  /// elimina el nodo bucket en el que estaba la clave
 
   eliminar_nodo_bucket(aux);
 
-  /// si ya no hay claves libero la memoria y pongo en nulo al table map
+  aux = pd->table_map + i * sizeof(t_bucket);
 
-  if(pd->indice_claves == NULL) {
+  /// se controla si todos los nodos son nulos
+
+  while(++i < pd->capacidad_maxima && *aux == NULL)
+    aux = pd->table_map + i * sizeof(t_bucket);
+
+  /// en caso de serlo se libera la memoria
+
+  if(*aux == NULL) {
     free(pd->table_map);
     pd->table_map = NULL;
   }
@@ -176,29 +167,22 @@ int sacar_diccionario(t_diccionario* pd,const void* clave,size_t tam_clave) {
 }
 
 void recorrer_diccionario(t_diccionario *pd,accion_diccionario act,void* param){
-  t_lista *aux = &pd->indice_claves;
-  t_bucket* bucket = pd->table_map;
-  size_t indice;
+  t_bucket* aux = pd->table_map;
+  int i = 0;
 
-  if(pd->funcion_hash == NULL || pd->table_map == NULL || pd->indice_claves == NULL)
+  if(pd->table_map == NULL)
     return;
 
-  if(act)
-    pd->act = act;
+  aux = pd->table_map + i * sizeof(t_bucket);
 
-  while(*aux) {
-
-    indice = *((size_t*)(*aux)->dato);
-    bucket = pd->table_map + indice * sizeof(t_bucket);
-
-    while(*bucket) {
-      pd->act(*bucket,param);
-      bucket = &(*bucket)->sig;
+  while(i < pd->capacidad_maxima){
+    while(*aux){
+      act(*aux,param);
+      aux = &(*aux)->sig;
     }
-
-    aux = &(*aux)->sig;
+    i++;
+    aux = pd->table_map + i * sizeof(t_bucket);
   }
-
 }
 
 void eliminar_nodo_bucket(t_bucket* pb) {
@@ -223,15 +207,15 @@ void vaciar_bucket(t_bucket* pb) {
   }
 }
 
-void vaciar_dicconario(t_diccionario* pd) {
+void vaciar_diccionario(t_diccionario* pd) {
   t_bucket *aux;
   int i = 0;
 
-  if(pd->indice_claves == NULL)
+  if(pd->table_map == NULL)
     return;
 
   while(++i < pd->capacidad_maxima) {
-    aux = pd->table_map + i*sizeof(t_bucket);
+    aux = pd->table_map + i * sizeof(t_bucket);
     vaciar_bucket(aux);
   }
   free(pd->table_map);

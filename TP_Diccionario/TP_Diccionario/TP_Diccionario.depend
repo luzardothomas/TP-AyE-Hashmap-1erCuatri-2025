@@ -1,26 +1,26 @@
 # depslib dependency file v1.0
-1748897415 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\tp_diccionario\main.c
+1749154014 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\tp_diccionario\main.c
 	"../biblioteca/procesador_de_textos.h"
 
-1748892397 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\diccionario.c
+1749154009 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\diccionario.c
 	"diccionario.h"
 
-1748888274 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\diccionario.h
+1749153999 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\diccionario.h
 	"lista.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 
-1748897311 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\procesador_de_textos.c
+1749154469 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\procesador_de_textos.c
 	"procesador_de_textos.h"
 
-1748896240 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\procesador_de_textos.h
+1749150717 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\procesador_de_textos.h
 	"diccionario.h"
 
-1748888557 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\lista.c
+1749151410 source:d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\lista.c
 	"lista.h"
 
-1748888557 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\lista.h
+1749151405 d:\1-proyectos_primcuatri2025_progra\tp_diccionario\biblioteca\lista.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

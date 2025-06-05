@@ -2,10 +2,14 @@
 
 #define TAM_PAL 5
 
+int comparar_palabras(const void* a,const void* b);
+void acumular_ocurrencia(void *a,void *b);
+int comparar_ocurrencias(const void *a,const void *b);
+void mostrar_podio_palabras(void* a,void* b);
+void ubicar_puestos(void* a,void * b);
+int filtrar_texto(const void* a,const void* b);
 void mostrar_dic_pal(void *a,void *b);
 void mostrar_dic_texto(void *a,void *b);
-void acumular_ocurrencia(void *a, const void *b);
-int comparar_palabras(const void* a,const void* b);
 
 typedef struct {
   char clave[TAM_PAL];
@@ -16,12 +20,6 @@ int comparar_palabras(const void* a,const void* b) {
   char* pa = (char*)a;
   char* pb = (char*)b;
   return strcmp(pa,pb);
-}
-
-int comparar_indices(const void*a,const void* b) {
-  size_t* pa = (size_t*)a;
-  size_t* pb = (size_t*)b;
-  return *pa - *pb;
 }
 
 void probar_diccionario(){
@@ -41,12 +39,12 @@ void probar_diccionario(){
 
 
   t_diccionario dic;
-  crear_diccionario(&dic,100,funcion_hash,comparar_palabras,mostrar_dic_pal,comparar_indices);
+  crear_diccionario(&dic,100,comparar_palabras);
 
   for(i = 0 ; i < sizeof(lote)/sizeof(lote[0]); i++)
-    poner_diccionario(&dic,lote[i].clave,lote[i].valor,sizeof(lote[i].clave),sizeof(lote[i].valor));
+    poner_diccionario(&dic,acumular_ocurrencia,lote[i].clave,lote[i].valor,sizeof(lote[i].clave),sizeof(lote[i].valor));
 
-  recorrer_diccionario(&dic,NULL,NULL);
+  recorrer_diccionario(&dic,mostrar_dic_pal,NULL);
 
   for(i = 0 ; i < sizeof(lote)/sizeof(lote[0]); i++) {
     obtener_diccionario(&dic,lote[i].clave,valor,sizeof(lote[0].clave),sizeof(lote[0].valor));
@@ -58,47 +56,31 @@ void probar_diccionario(){
   for(i = 0 ; i < sizeof(lote)/sizeof(lote[0]); i++)
     sacar_diccionario(&dic,lote[i].clave,sizeof(lote[0].clave));
 
-  recorrer_diccionario(&dic,NULL,NULL);
+  recorrer_diccionario(&dic,mostrar_dic_pal,NULL);
 
 
 }
 
-void acumular_ocurrencia(void *a, const void *b) {
+void acumular_ocurrencia(void *a, void *b) {
   size_t *pa = (size_t*)a;
   *pa += 1;
 }
 
-int comparar_enteros(const void *a,const void *b) {
-  int *pa = (int*)a;
-  int *pb = (int*)b;
-  return *pa - *pb;
-}
-
-void mostrar_enteros(void *a,void *b) {
-  int *pa = (int*)a;
-  printf("%d\n",*pa);
-}
-
-void probar_lista() {
-  t_lista lista;
-  int vector [] = {1,2,3,4,5,6,7};
-  int i;
-  crear_lista(&lista);
-  size_t hasta = 5;
-  for(i = 0 ; i < sizeof(vector)/sizeof(vector[0]) ; i++)
-    insertar_en_orden_hasta(&lista,&vector[i],sizeof(vector[0]),comparar_enteros,&hasta);
-  recorrer_lista(&lista,mostrar_enteros,NULL);
-}
-
 int comparar_ocurrencias(const void *a,const void *b) {
-  t_registro_texto *pa = (t_registro_texto*)a;
-  t_registro_texto *pb = (t_registro_texto*)b;
+  t_registro_podio *pa = (t_registro_podio*)a;
+  t_registro_podio *pb = (t_registro_podio*)b;
   return pa->ocurrencias - pb->ocurrencias;
 }
 
 void mostrar_podio_palabras(void* a,void* b) {
-  t_registro_texto *pa = (t_registro_texto*)a;
-  printf("Palabra '%s' Ocurrencias %ld\n",pa->clave,(long)pa->ocurrencias);
+  t_registro_podio *pa = (t_registro_podio*)a;
+  printf("[PUESTO %ld] Palabra '%s' Ocurrencias %ld\n",(long)pa->puesto,pa->clave,(long)pa->ocurrencias);
+}
+
+void ubicar_puestos(void* a,void * b) {
+  t_registro_podio *pa = (t_registro_podio*)a;
+  size_t* pb = (size_t*)b;
+  pa->puesto = *pb;
 }
 
 int filtrar_texto(const void* a,const void* b) {
@@ -118,35 +100,37 @@ void probar_procesador_de_texto() {
   t_lista podio;
   size_t podio_hasta = 5;
 
+
   generar_texto();
 
   if(!abrir_archivo(&texto,"texto.txt","rt"))
     return;
 
-  crear_diccionario(&dic,100,funcion_hash,comparar_palabras,acumular_ocurrencia,comparar_indices);
+  crear_diccionario(&dic,100,comparar_palabras);
   crear_lista(&podio);
 
-  procesar_texto(texto,&dic);
+  procesar_texto(texto,&dic,acumular_ocurrencia);
   recorrer_diccionario(&dic,mostrar_dic_texto,NULL);
 
-  printf("TOP %ld\n",(long)podio_hasta);
+  printf("------------------------- PODIO DE %ld -------------------------\n",(long)podio_hasta);
 
-  generar_podio(&podio,comparar_ocurrencias,&dic,filtrar_texto,&podio_hasta,NULL);
-
+  generar_podio(&podio,comparar_ocurrencias,ubicar_puestos,&dic,filtrar_texto,&podio_hasta,NULL);
 
   recorrer_lista(&podio,mostrar_podio_palabras,NULL);
 
   vaciar_lista(&podio);
-  vaciar_dicconario(&dic);
+  vaciar_diccionario(&dic);
   fclose(texto);
 
 
 }
 
 int main() {
-  //probar_diccionario();
+  puts("============================ PARTE 1 ============================");
+  probar_diccionario();
+  puts("============================ PARTE 2 ============================");
   probar_procesador_de_texto();
-  //probar_lista();
+
 }
 
 void mostrar_dic_texto(void *a,void *b) {

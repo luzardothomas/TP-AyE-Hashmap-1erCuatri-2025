@@ -19,7 +19,6 @@ typedef t_nodo_lista* t_lista;
 void crear_lista(t_lista* pl);
 int insertar_al_principio_lista(t_lista* pl,const void* dato,size_t tam);
 int insertar_en_orden_hasta(t_lista* pl,const void* dato,size_t tam,comparar_lista cmp,size_t* hasta);
-t_lista* buscar_lista(t_lista* pl,void* dato,comparar_lista cmp);
 void recorrer_lista(const t_lista* pl,accion_lista act,void* param);
 void eliminar_nodo_del_final(t_lista* pl);
 void eliminar_nodo(t_lista* pl);
