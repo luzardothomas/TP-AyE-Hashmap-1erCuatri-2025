@@ -95,3 +95,35 @@
 1749479650 source:c:\users\thomas\desktop\tp-aye-hashmap\tp_diccionario\biblioteca\menu.c
 	"menu.h"
 
+1749144290 source:c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\diccionario.c
+	"diccionario.h"
+
+1749144290 c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\diccionario.h
+	"lista.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1749144290 c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\lista.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1749144290 source:c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\lista.c
+	"lista.h"
+
+1749207442 source:c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\procesador_de_textos.c
+	"procesador_de_textos.h"
+
+1749207540 c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\procesador_de_textos.h
+	"diccionario.h"
+
+1749210768 source:c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\tp_diccionario\main.c
+	"../biblioteca/procesador_de_textos.h"
+	"../biblioteca/menu.h"
+
+1749210574 c:\users\thomas\documents\github\tp-aye-hashmap-1ercuatri-2025\tp_diccionario\biblioteca\menu.h
+	"procesador_de_textos.h"
+	"diccionario.h"
+	<ctype.h>
+

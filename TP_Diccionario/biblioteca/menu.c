@@ -54,7 +54,7 @@ void usar_procesador_de_texto(const char* path_lote, size_t capacidad) {
   FILE* texto;
   t_diccionario dic;
   t_lista podio;
-  size_t podio_hasta = 3;
+  size_t podio_hasta = 5;
 
   if(!abrir_archivo(&texto,path_lote,"rt"))
     return;
