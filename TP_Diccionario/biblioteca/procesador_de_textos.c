@@ -137,3 +137,66 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
   return 1;
 }
 
+int comparar_palabras(const void* a,const void* b) {
+  char* pa = (char*)a;
+  char* pb = (char*)b;
+  return strcmp(pa,pb);
+}
+
+void acumular_ocurrencia(void *a, void *b) {
+  size_t *pa = (size_t*)a;
+  *pa += 1;
+}
+
+void mostrar_dic_texto(void *a,void *b) {
+  t_nodo_bucket *aux = (t_nodo_bucket*)a;
+  char *cla = (char*)aux->clave;
+  size_t *val = (size_t*)aux->valor;
+
+  printf("|Clave: '%s' Ocurrencias: %ld| ",cla,(long)*val);
+
+  if(aux->sig)
+    printf(" ==> ");
+  else
+    puts("");
+}
+
+int comparar_ocurrencias(const void *a,const void *b) {
+  t_registro_podio *pa = (t_registro_podio*)a;
+  t_registro_podio *pb = (t_registro_podio*)b;
+  return pa->ocurrencias - pb->ocurrencias;
+}
+
+void mostrar_podio_palabras(void* a,void* b) {
+  t_registro_podio *pa = (t_registro_podio*)a;
+  printf("[PUESTO %ld] Palabra '%s' Ocurrencias %ld\n",(long)pa->puesto,pa->clave,(long)pa->ocurrencias);
+}
+
+void ubicar_puestos(void* a,void * b) {
+  t_registro_podio *pa = (t_registro_podio*)a;
+  size_t* pb = (size_t*)b;
+  pa->puesto = *pb;
+}
+
+int filtrar_texto(const void* a,const void* b) {
+  t_nodo_bucket* aux = (t_nodo_bucket*)a;
+
+  char* pa = (char*)aux->clave;
+
+  return strcmp(pa,"Palabras") != 0 &&
+         strcmp(pa,"Espacios") != 0 &&
+         strcmp(pa,"Signos de puntuacion") != 0;
+}
+
+void mostrar_dic_pal(void *a,void *b){
+  t_nodo_bucket *aux = (t_nodo_bucket*)a;
+  char *cla = (char*)aux->clave;
+  char *val = (char*)aux->valor;
+  printf("|Clave: %s Valor: %s|",cla,val);
+
+  if(aux->sig)
+    printf(" ==> ");
+  else
+    puts("");
+
+}

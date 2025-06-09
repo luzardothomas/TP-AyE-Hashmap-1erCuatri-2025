@@ -39,6 +39,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../biblioteca/lista.h" />
+		<Unit filename="../biblioteca/menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../biblioteca/menu.h" />
 		<Unit filename="../biblioteca/procesador_de_textos.c">
 			<Option compilerVar="CC" />
 		</Unit>

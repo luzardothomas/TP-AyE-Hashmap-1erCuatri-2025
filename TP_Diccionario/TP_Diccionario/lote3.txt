@@ -1,0 +1,24 @@
+En programacion, un algoritmo es una secuencia de pasos logicos y 
+finitos que resuelven un problema especifico. 
+Cuando se trabaja con estructuras de datos, uno de los TDA mas utilizados es la pila, 
+ya que permite organizar la informacion de forma ordenada y controlada. 
+Una pila funciona bajo el principio LIFO (Last In, First Out), 
+lo que significa que el ultimo elemento en ingresar es el primero en salir. 
+Este comportamiento es util en muchos algoritmos, como los de recorrido de arboles, 
+analisis de expresiones matematicas o control de llamadas en un programa. 
+La relacion entre algoritmos y TDA es fundamental, ya que elegir el TDA adecuado puede 
+simplificar o incluso hacer posible la implementacion eficiente de un 
+algoritmo.
+
+Por ejemplo, en el caso de un algoritmo que evalua expresiones en notacion postfija, 
+el uso de una pila resulta esencial. 
+Cada vez que el algoritmo encuentra 
+un numero, lo apila; y cuando encuentra un operador, desapila los elementos necesarios, 
+realiza la operacion y vuelve a apilar el resultado. 
+Este uso repetido de la pila demuestra como este TDA permite estructurar y 
+simplificar el diseno del algoritmo. 
+Ademas, al tratarse de un TDA, la pila puede implementarse de 
+diferentes maneras (por ejemplo, con arreglos o listas enlazadas), 
+pero su comportamiento logico se mantiene constante, 
+lo que permite que multiples algoritmos 
+la aprovechen de forma coherente y reutilizable.

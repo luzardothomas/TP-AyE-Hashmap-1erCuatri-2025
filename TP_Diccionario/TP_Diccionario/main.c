@@ -1,26 +1,5 @@
 #include "../biblioteca/procesador_de_textos.h"
-
-#define TAM_PAL 5
-
-int comparar_palabras(const void* a,const void* b);
-void acumular_ocurrencia(void *a,void *b);
-int comparar_ocurrencias(const void *a,const void *b);
-void mostrar_podio_palabras(void* a,void* b);
-void ubicar_puestos(void* a,void * b);
-int filtrar_texto(const void* a,const void* b);
-void mostrar_dic_pal(void *a,void *b);
-void mostrar_dic_texto(void *a,void *b);
-
-typedef struct {
-  char clave[TAM_PAL];
-  char valor[TAM_PAL];
-}t_registro;
-
-int comparar_palabras(const void* a,const void* b) {
-  char* pa = (char*)a;
-  char* pb = (char*)b;
-  return strcmp(pa,pb);
-}
+#include "../biblioteca/menu.h"
 
 void probar_diccionario(){
   t_registro lote[] = {{"hola","vaca"},
@@ -60,39 +39,6 @@ void probar_diccionario(){
 
 
 }
-
-void acumular_ocurrencia(void *a, void *b) {
-  size_t *pa = (size_t*)a;
-  *pa += 1;
-}
-
-int comparar_ocurrencias(const void *a,const void *b) {
-  t_registro_podio *pa = (t_registro_podio*)a;
-  t_registro_podio *pb = (t_registro_podio*)b;
-  return pa->ocurrencias - pb->ocurrencias;
-}
-
-void mostrar_podio_palabras(void* a,void* b) {
-  t_registro_podio *pa = (t_registro_podio*)a;
-  printf("[PUESTO %ld] Palabra '%s' Ocurrencias %ld\n",(long)pa->puesto,pa->clave,(long)pa->ocurrencias);
-}
-
-void ubicar_puestos(void* a,void * b) {
-  t_registro_podio *pa = (t_registro_podio*)a;
-  size_t* pb = (size_t*)b;
-  pa->puesto = *pb;
-}
-
-int filtrar_texto(const void* a,const void* b) {
-  t_nodo_bucket* aux = (t_nodo_bucket*)a;
-
-  char* pa = (char*)aux->clave;
-
-  return strcmp(pa,"Palabras") != 0 &&
-         strcmp(pa,"Espacios") != 0 &&
-         strcmp(pa,"Signos de puntuacion") != 0;
-}
-
 void probar_procesador_de_texto() {
 
   FILE* texto;
@@ -101,7 +47,7 @@ void probar_procesador_de_texto() {
   size_t podio_hasta = 5;
 
 
-  generar_texto();
+  //generar_texto();
 
   if(!abrir_archivo(&texto,"texto.txt","rt"))
     return;
@@ -126,35 +72,5 @@ void probar_procesador_de_texto() {
 }
 
 int main() {
-  puts("============================ PARTE 1 ============================");
-  probar_diccionario();
-  puts("============================ PARTE 2 ============================");
-  probar_procesador_de_texto();
-
-}
-
-void mostrar_dic_texto(void *a,void *b) {
-  t_nodo_bucket *aux = (t_nodo_bucket*)a;
-  char *cla = (char*)aux->clave;
-  size_t *val = (size_t*)aux->valor;
-
-  printf("|Clave: '%s' Ocurrencias: %ld| ",cla,(long)*val);
-
-  if(aux->sig)
-    printf(" ==> ");
-  else
-    puts("");
-}
-
-void mostrar_dic_pal(void *a,void *b){
-  t_nodo_bucket *aux = (t_nodo_bucket*)a;
-  char *cla = (char*)aux->clave;
-  char *val = (char*)aux->valor;
-  printf("|Clave: %s Valor: %s|",cla,val);
-
-  if(aux->sig)
-    printf(" ==> ");
-  else
-    puts("");
-
+    menu_diccionario();
 }
