@@ -25,6 +25,8 @@ typedef struct s_nodo_bucket {
 
 typedef t_nodo_bucket* t_bucket;
 
+/// FUNCION DE HASH
+
 size_t funcion_hash(const unsigned char *data,size_t len);
 
 /// PRIMITIVAS DE DICCIONARIO
@@ -36,7 +38,7 @@ int sacar_diccionario(t_diccionario* pd,const void* clave,size_t tam_clave);
 void recorrer_diccionario(t_diccionario *pd,accion_diccionario act,void* param);
 void vaciar_diccionario(t_diccionario* pd);
 
-/// PRIMITIVA DE BUCKET
+/// PRIMITIVAS DE BUCKET
 
 void eliminar_nodo_bucket(t_bucket* pb);
 void vaciar_bucket(t_bucket* pb);

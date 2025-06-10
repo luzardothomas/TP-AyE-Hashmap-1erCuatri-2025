@@ -29,6 +29,21 @@ int poner_diccionario(t_diccionario* pd,accion_diccionario act,const void* clave
   hash = funcion_hash(clave,tam_clave);
   indice = hash % pd->capacidad_maxima;
 
+  /// chequear si hay un bucket
+
+  aux = pd->table_map + indice * sizeof(t_bucket);
+
+  while((*aux) && (comp = pd->cmp((*aux)->clave,clave)) != 0)
+    aux = &(*aux)->sig;
+
+  /// controlar si hay clave duplicada
+
+  if(comp == 0) {
+    if(act)
+      act((*aux)->valor,(void*)valor);
+    return 2;
+  }
+
   /// insertar en el bucket
 
   nue = (t_nodo_bucket*)malloc(sizeof(t_nodo_bucket));
@@ -56,24 +71,6 @@ int poner_diccionario(t_diccionario* pd,accion_diccionario act,const void* clave
   nue->tam_clave = tam_clave;
   nue->tam_valor = tam_valor;
   nue->sig = NULL;
-
-  /// chequear si hay un bucket
-
-  aux = pd->table_map + indice *sizeof(t_bucket);
-
-  while((*aux) && (comp = pd->cmp((*aux)->clave,clave)) != 0)
-    aux = &(*aux)->sig;
-
-  /// controlar si hay clave duplicada
-
-  if(comp == 0) {
-    free(nue->clave);
-    free(nue->valor);
-    free(nue);
-    if(act)
-      act((*aux)->valor,(void*)valor);
-    return 2;
-  }
 
   *aux = nue;
 

@@ -1,17 +1,5 @@
 #include "procesador_de_textos.h"
 
-void generar_texto() {
-  FILE* f_texto;
-  const char* texto = "Agustina Agustina Agustina Agustina Agustina Guns Guns Guns Guns And Roses Roses Rock And  !!!!!!!!!!!!!!!.......     .....,,,,,,,,,,::::::::";
-
-  f_texto = fopen("texto.txt","wt");
-  if(f_texto == NULL)
-    return;
-
-  fprintf(f_texto,"%s",texto);
-  fclose(f_texto);
-}
-
 int abrir_archivo(FILE** pf,const char* nombre,const char* tipo) {
   *pf = fopen(nombre,tipo);
   if(!*pf)
@@ -35,13 +23,19 @@ int es_espacio(const char* car) {
   return *car == ' ';
 }
 
+void a_minuscula(char* letra) {
+  *letra = (*letra >= 'A' && *letra <= 'Z') ? *letra + ('a' - 'A') : *letra;
+}
+
 char* procesar_palabra(char* linea) {
-  while(*linea && es_letra(linea) == 1)
+  while(*linea && es_letra(linea) == 1) {
+    a_minuscula(linea);
     linea++;
+  }
   return linea;
 }
 
-void procesar_linea(char* linea,t_diccionario* pd,accion_diccionario act) {
+void procesar_linea(char* linea,t_diccionario* pd,accion_diccionario act,size_t* palabras,size_t* espacios,size_t* signos_puntuacion) {
   char palabra[100];
   char* final_cadena =  NULL;
   size_t len;
@@ -57,15 +51,15 @@ void procesar_linea(char* linea,t_diccionario* pd,accion_diccionario act) {
       *(palabra + len) = '\0';
       strcpy(reg.clave,palabra);
       poner_diccionario(pd,act,reg.clave,&reg.ocurrencias,len + 1,sizeof(reg.ocurrencias));
-      poner_diccionario(pd,act,"Palabras\0",&reg.ocurrencias,sizeof(reg.clave),sizeof(reg.ocurrencias));
+      (*palabras)++;
     }
 
     linea = final_cadena;
 
     if(es_espacio(linea))
-      poner_diccionario(pd,act,"Espacios\0",&reg.ocurrencias,sizeof(reg.clave),sizeof(reg.ocurrencias));
+      (*espacios)++;
     else if(es_signo_puntuacion(linea))
-      poner_diccionario(pd,act,"Signos de puntuacion\0",&reg.ocurrencias,sizeof(reg.clave),sizeof(reg.ocurrencias));
+      (*signos_puntuacion)++;
 
     linea++;
   }
@@ -74,19 +68,28 @@ void procesar_linea(char* linea,t_diccionario* pd,accion_diccionario act) {
 
 int procesar_texto(FILE* pf,t_diccionario* pd,accion_diccionario act) {
   char linea[100];
+  size_t cant_palabras = 0;
+  size_t cant_espacios = 0;
+  size_t cant_signos_puntuacion = 0;
+
 
   while(fgets(linea,100,pf))
-    procesar_linea(linea,pd,act);
+    procesar_linea(linea,pd,act,&cant_palabras,&cant_espacios,&cant_signos_puntuacion);
+
+  printf("Cantidad de palabras: %ld\n",(long)cant_palabras);
+  printf("Cantidad de espacios: %ld\n",(long)cant_espacios);
+  printf("Cantidad de signos de puntuacion: %ld\n",(long)cant_signos_puntuacion);
 
   return 1;
 }
 
-int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionario* pd,comparar_diccionario cmp_dic,size_t* podio_hasta,void* param) {
+int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionario* pd,size_t escalones,void* param) {
   t_registro_podio reg;
   t_bucket* aux;
   t_nodo_lista* mayor = NULL;
+  t_nodo_lista** elim;
   size_t puesto = 1;
-  size_t contar_puestos = 0;
+  size_t contar_puestos = 1;
   int i = 0;
 
   if(pd->table_map == NULL)
@@ -94,45 +97,44 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
 
   aux = pd->table_map + i * sizeof(t_bucket);
 
-  /// primero hay que cargar un TOP en la lista
+  /// primero hay que cargar en orden los elementos del diccionario en una lista
 
   while(i < pd->capacidad_maxima) {
 
     while(*aux){
-      if(cmp_dic(*aux,param)) {
-        strcpy(reg.clave,(char*)(*aux)->clave);
-        reg.ocurrencias = *((size_t*)(*aux)->valor);
-        insertar_en_orden_hasta(podio,&reg,sizeof(reg),cmp,podio_hasta);
-      }
+      strcpy(reg.clave,(char*)(*aux)->clave);
+      reg.ocurrencias = *((size_t*)(*aux)->valor);
+      insertar_en_orden(podio,&reg,sizeof(reg),cmp);
+
       aux = &(*aux)->sig;
     }
     i++;
     aux = pd->table_map + i * sizeof(t_bucket);
   }
 
-  /// ahora que tenemos el TOP es mas facil cargar los puestos del podio
+  /// ahora que tenemos una lista en orden generamos el podio
 
-  if(*podio) {
-    act((*podio)->dato,&puesto);
-    mayor = *podio;
-    podio = &(*podio)->sig;
-    contar_puestos++;
-    while(*podio) {
+  i = 1;
 
-      if(cmp(mayor->dato,(*podio)->dato) == 0)
-        act((*podio)->dato,&puesto);
-      else {
-        mayor = *podio;
-        puesto = contar_puestos + 1;
-        act((*podio)->dato,&puesto);
-      }
+  mayor = *podio;
 
-      contar_puestos++;
-      podio = &(*podio)->sig;
-
+  while(*podio && i <= escalones) {
+    if(cmp(mayor->dato,(*podio)->dato) == 0)
+      act((*podio)->dato,&puesto);
+    else {
+      mayor = *podio;
+      puesto = contar_puestos;
+      i++;
+      act((*podio)->dato,&contar_puestos);
     }
 
+    contar_puestos++;
+    elim = podio;
+    podio = &(*podio)->sig;
   }
+
+  if(*podio)
+    vaciar_lista(elim);
 
   return 1;
 }
@@ -176,16 +178,6 @@ void ubicar_puestos(void* a,void * b) {
   t_registro_podio *pa = (t_registro_podio*)a;
   size_t* pb = (size_t*)b;
   pa->puesto = *pb;
-}
-
-int filtrar_texto(const void* a,const void* b) {
-  t_nodo_bucket* aux = (t_nodo_bucket*)a;
-
-  char* pa = (char*)aux->clave;
-
-  return strcmp(pa,"Palabras") != 0 &&
-         strcmp(pa,"Espacios") != 0 &&
-         strcmp(pa,"Signos de puntuacion") != 0;
 }
 
 void mostrar_dic_pal(void *a,void *b){

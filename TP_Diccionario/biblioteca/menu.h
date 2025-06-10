@@ -14,7 +14,9 @@
                      "-->"
 #define MENU_OPCIONES "ABCDS"
 
+/// FUNCIONES DE MENU
+
 void menu_diccionario();
-void usar_procesador_de_texto(const char* path_lote, size_t capacidad);
+void usar_procesador_de_texto(const char* path_lote, size_t capacidad, size_t escalones);
 
 #endif // MENU_H_INCLUDED
