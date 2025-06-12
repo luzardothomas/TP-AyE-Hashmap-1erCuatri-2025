@@ -89,7 +89,8 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
   t_nodo_lista* mayor = NULL;
   t_nodo_lista** elim;
   size_t puesto = 1;
-  size_t contar_puestos = 1;
+  int ganadores = 1;
+  int comp = 2;
   int i = 0;
 
   if(pd->table_map == NULL)
@@ -114,23 +115,30 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
 
   /// ahora que tenemos una lista en orden generamos el podio
 
-  i = 1;
-
   mayor = *podio;
 
-  while(*podio && i <= escalones) {
-    if(cmp(mayor->dato,(*podio)->dato) == 0)
+  i = 0;
+
+  while(*podio && puesto <= escalones) {
+    ganadores = 1;
+
+    while(*podio && (comp = cmp(mayor->dato,(*podio)->dato)) == 0) {
       act((*podio)->dato,&puesto);
-    else {
-      mayor = *podio;
-      puesto = contar_puestos;
-      i++;
-      act((*podio)->dato,&contar_puestos);
+      podio = &(*podio)->sig;
+      if(i != 0)
+        ganadores++;
+      i = 1;
     }
 
-    contar_puestos++;
-    elim = podio;
-    podio = &(*podio)->sig;
+    mayor = *podio;
+    puesto += ganadores;
+
+    if(*podio) {
+      act((*podio)->dato,&puesto);
+      elim = podio;
+      podio = &(*podio)->sig;
+
+    }
   }
 
   if(*podio)

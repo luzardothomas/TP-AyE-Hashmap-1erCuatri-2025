@@ -27,15 +27,15 @@ void menu_diccionario()
         switch(opc)
         {
         case 'A':
-            usar_procesador_de_texto("lote1.txt",2000,5);
+            usar_procesador_de_texto("lote1.txt",100,5);
             system("pause");
             break;
         case 'B':
-            usar_procesador_de_texto("lote2.txt",2000,5);
+            usar_procesador_de_texto("lote2.txt",200,5);
             system("pause");
             break;
         case 'C':
-            usar_procesador_de_texto("lote3.txt",2000,5);
+            usar_procesador_de_texto("lote3.txt",300,5);
             system("pause");
             break;
         case 'D':
