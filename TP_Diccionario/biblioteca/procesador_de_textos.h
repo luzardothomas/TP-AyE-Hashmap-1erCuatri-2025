@@ -38,6 +38,7 @@ void a_minuscula(char* letra);
 char* procesar_palabra(char* linea);
 void procesar_linea(char* linea,t_diccionario* pd,accion_diccionario act,size_t* palabras,size_t* espacios,size_t* signos_puntuacion);
 int procesar_texto(FILE* pf,t_diccionario* pd,accion_diccionario act);
+t_lista* procesar_ganadores(t_lista* podio,comparar_lista cmp,accion_lista act,size_t* ganadores,size_t puesto);
 int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionario* pd,size_t podio_hasta,void* param);
 
 /// FUNCIONES DE ACCIONES Y COMPARACIONES

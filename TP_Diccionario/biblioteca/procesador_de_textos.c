@@ -83,14 +83,29 @@ int procesar_texto(FILE* pf,t_diccionario* pd,accion_diccionario act) {
   return 1;
 }
 
+t_lista* procesar_ganadores(t_lista* podio,comparar_lista cmp,accion_lista act,size_t* ganadores,size_t puesto) {
+  t_nodo_lista* mayor = *podio;
+
+  if(!*podio)
+    return podio;
+
+  act((*podio)->dato,&puesto);
+
+  podio = &(*podio)->sig;
+
+  while(*podio && cmp((*podio)->dato,mayor->dato) == 0) {
+    act((*podio)->dato,&puesto);
+    (*ganadores)++;
+    podio = &(*podio)->sig;
+  }
+  return podio;
+}
+
 int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionario* pd,size_t escalones,void* param) {
   t_registro_podio reg;
   t_bucket* aux;
-  t_nodo_lista* mayor = NULL;
-  t_nodo_lista** elim;
   size_t puesto = 1;
-  int ganadores = 1;
-  int comp = 2;
+  size_t ganadores = 1;
   int i = 0;
 
   if(pd->table_map == NULL)
@@ -106,7 +121,6 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
       strcpy(reg.clave,(char*)(*aux)->clave);
       reg.ocurrencias = *((size_t*)(*aux)->valor);
       insertar_en_orden(podio,&reg,sizeof(reg),cmp);
-
       aux = &(*aux)->sig;
     }
     i++;
@@ -115,34 +129,15 @@ int generar_podio(t_lista* podio,comparar_lista cmp,accion_lista act,t_diccionar
 
   /// ahora que tenemos una lista en orden generamos el podio
 
-  mayor = *podio;
-
-  i = 0;
-
   while(*podio && puesto <= escalones) {
-    ganadores = 1;
-
-    while(*podio && (comp = cmp(mayor->dato,(*podio)->dato)) == 0) {
-      act((*podio)->dato,&puesto);
-      podio = &(*podio)->sig;
-      if(i != 0)
-        ganadores++;
-      i = 1;
-    }
-
-    mayor = *podio;
+    podio = procesar_ganadores(podio,cmp,act,&ganadores,puesto);
     puesto += ganadores;
-
-    if(*podio) {
-      act((*podio)->dato,&puesto);
-      elim = podio;
-      podio = &(*podio)->sig;
-
-    }
   }
 
+  /// se eliminan los datos que esten por fuera del podio
+
   if(*podio)
-    vaciar_lista(elim);
+    vaciar_lista(podio);
 
   return 1;
 }
